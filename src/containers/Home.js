@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { DataStore } from "../data/DataStore";
 import "./Home.css";
+import {Redirect} from "react-router-dom";
 
 export default class Home extends Component {
     constructor(props) {
@@ -11,6 +12,10 @@ export default class Home extends Component {
         };
     }
     render() {
+        const username = this.state.username;
+        if (username === '') {
+            return (<Redirect to="/" />);
+        }
         return (
             <div className="Home">
                 <div>User {this.state.username}'s homepage</div>

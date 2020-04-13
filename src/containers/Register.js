@@ -4,24 +4,26 @@ import Button from "react-bootstrap/Button";
 import "./Register.css";
 import {APIUrl /*, DataStore */} from "../data/DataStore";
 
-export default class Signup extends Component {
+export default class Register extends Component {
     constructor(props) {
         super(props);
         this.state = {
             email: '',
             username: '',
+            nickname: '',
             password: '',
             const_email: '',
             const_username: '',
+            const_nickname: '',
             const_password: '',
-            signupSuccess: false,
+            registerSuccess: false,
             user_id: -1
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
-        this.handleSignupResponse = this.handleSignupResponse.bind(this);
+        this.handleRegisterResponse = this.handleRegisterResponse.bind(this);
     }
 
     handleChange(event) {
@@ -35,8 +37,9 @@ export default class Signup extends Component {
         this.setState((state) => ({
             const_email: state.email,
             const_username: state.username,
+            const_nickname: state.nickname,
             const_password: state.password
-        }), () => fetch(APIUrl + "/auth/signup", {
+        }), () => fetch(APIUrl + "/user/register", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -44,26 +47,26 @@ export default class Signup extends Component {
             },
             body: JSON.stringify({
                 "username": this.state.const_username,
+                "nickname": this.state.const_nickname,
                 "password": this.state.const_password,
                 "email": this.state.const_email
             })
         }).then(function (response) {
             return response.json();
-        }).then(response => this.handleSignupResponse(response)));
+        }).then(response => this.handleRegisterResponse(response)));
     }
 
-    handleSignupResponse (response) {
-        if (response['code'] === 200 &&
-            response['msg'] === "success" &&
-            'user_id' in response['data']
+    handleRegisterResponse (response) {
+        if (response['message'] === "OK" &&
+            'user_id' in response
         ) {
             this.setState({
-                signupSuccess: true,
-                user_id: response['data']['user_id']
+                registerSuccess: true,
+                user_id: response['user_id']
             });
         }
         else {
-            alert("Signup failed! Code: " + response['code'] + ", msg: " + response['msg']);
+            alert("Register failed! Message: " + response['message']);
         }
     }
 
@@ -74,17 +77,17 @@ export default class Signup extends Component {
     }
 
     render() {
-        let signupSuccessNotify;
-        if (this.state.signupSuccess) {
-            signupSuccessNotify =
+        let registerSuccessNotify;
+        if (this.state.registerSuccess) {
+            registerSuccessNotify =
                 <div>
-                    <p>Congratulations! You signed up successfully to be No. {this.state.user_id} user of Handsapp! </p>
-                    <p>Signed up with username: {this.state.const_username} and email: {this.state.const_email}.</p>
+                    <p>Congratulations! You registered up successfully to be No. {this.state.user_id} user of Fun with flags! </p>
+                    <p>Registered with username: {this.state.const_username} and email: {this.state.const_email}.</p>
                     <p>Please login <a href="/login">here</a>.</p>
                 </div>;
         }
         else {
-            signupSuccessNotify = <div></div>;
+            registerSuccessNotify = <div></div>;
         }
         return (
             <div className="Login">
@@ -111,6 +114,17 @@ export default class Signup extends Component {
                             onChange={this.handleChange}
                         />
                     </Form.Group>
+                    <Form.Group controlId="nickname" bsSize="large">
+                        <Form.Label>
+                            Nickname
+                        </Form.Label>
+                        <Form.Control
+                            autoFocus
+                            type="nickname"
+                            value={this.state.nickname}
+                            onChange={this.handleChange}
+                        />
+                    </Form.Group>
                     <Form.Group controlId="password" bsSize="large">
                         <Form.Label>
                             Password
@@ -131,7 +145,7 @@ export default class Signup extends Component {
                     </Button>
                 </Form>
                 <div>
-                    {signupSuccessNotify}
+                    {registerSuccessNotify}
                 </div>
             </div>
         );
